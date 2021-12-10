@@ -1,5 +1,5 @@
 from django.db import models
-from django.urls import base
+
 
 # Create your models here.
 
@@ -18,6 +18,9 @@ class Host(models.Model):
     lab_name = models.CharField(max_length=10, default='')
     rack_name = models.CharField(max_length=30, default='')
     rack_position = models.CharField(max_length=20, default='')
+
+    def __str__(self):
+        return '%s object ["hostname":%s]' % (self.__class__.__name__, self.hostname)
     
 
     
