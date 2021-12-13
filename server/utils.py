@@ -30,9 +30,11 @@ def generate_host_data(ip,
     HOSTNAME_CMD = '''hostname'''
     CPU_NAME_CMD = '''lscpu | grep "^Model name" | cut -d: -f2 | cut -d@ -f1'''
     CPU_BASE_CLOCK_CMD = '''lscpu | grep "^Model name" | cut -d: -f2 | cut -d@ -f2'''
-    GET_SSD_LIST_CMD = '''lsblk | egrep -e "^sd|^nvme" | awk '{print $1,$4}''''
-    HOSTNAME_CMD = '''hostname'''
-
+    DISK_LIST_CMD = '''lsblk | egrep -e "^sd|^nvme" | awk '{print $1,$4}' '''
+    OS_CMD = ''' grep -i "PRETTY_NAME" /etc/os-release | cut -d'"' -f2 '''
+    BIOS_VERSION_CMD = ''' dmidecode -t bios | grep -i "version" | awk '{print $2}' '''
+    MEMORY_CMD = ''' dmidecode -t memory | grep  Size: | grep -v "No Module Installed" | awk '{sum+=$2}END{print sum"GB"}' '''
+    MEMORY_DETAIL_CMD = ''' dmidecode -t memory | grep -e "Size:" -e  "Speed:" | grep -v "No Module Installed" | grep  -v "Configured Memory Speed" | awk '{if(NR%2==1) printf $2 $3 " " ;else print $2 $3 }' '''
 
     ssh = get_ssh_client(ip, port, username, password)
 
@@ -40,8 +42,12 @@ def generate_host_data(ip,
     host.hostname = execute_command(ssh, HOSTNAME_CMD)
     host.cpu_name = execute_command(ssh, CPU_NAME_CMD)
     host.cpu_base_clock = execute_command(ssh, CPU_BASE_CLOCK_CMD)
-    # print(execute_command(ssh, GET_SSD_LIST_CMD))
-    # host.save()
+    host.disk = execute_command(ssh, DISK_LIST_CMD)
+    host.ip = ip
+    host.os = execute_command(ssh, OS_CMD)
+    host.bios_version = execute_command(ssh, BIOS_VERSION_CMD)
+    host.memory = execute_command(ssh, MEMORY_CMD)
+    host.memory_detail = execute_command(ssh, MEMORY_DETAIL_CMD)
     
     ssh.close()
     return host

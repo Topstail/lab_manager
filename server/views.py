@@ -11,7 +11,7 @@ def show_all_host(request):
     password = 'intel@123'
     host = utils.generate_host_data('10.238.152.182', 22, 'root', 'intel@123')
     print(host)
-    print(host.hostname)
+    print(host.os)
     return render(request, 'host_list.html', locals())
 
 def show_dashboard(request):
