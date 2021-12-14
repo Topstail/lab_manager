@@ -28,22 +28,25 @@ def generate_host_data(ip,
 
 
     HOSTNAME_CMD = '''hostname'''
-    CPU_NAME_CMD = '''lscpu | grep "^Model name" | cut -d: -f2 | cut -d@ -f1'''
+    CPU_NAME_CMD = '''lscpu | grep "^Model name" | cut -d: -f2 | cut -d@ -f1 | sed 's/\$//g' '''
     CPU_BASE_CLOCK_CMD = '''lscpu | grep "^Model name" | cut -d: -f2 | cut -d@ -f2'''
     DISK_LIST_CMD = '''lsblk | egrep -e "^sd|^nvme" | awk '{print $1,$4}' '''
     OS_CMD = ''' grep -i "PRETTY_NAME" /etc/os-release | cut -d'"' -f2 '''
     BIOS_VERSION_CMD = ''' dmidecode -t bios | grep -i "version" | awk '{print $2}' '''
-    MEMORY_CMD = ''' dmidecode -t memory | grep  Size: | grep -v "No Module Installed" | awk '{sum+=$2}END{print sum"GB"}' '''
-    MEMORY_DETAIL_CMD = ''' dmidecode -t memory | grep -e "Size:" -e  "Speed:" | grep -v "No Module Installed" | grep  -v "Configured Memory Speed" | awk '{if(NR%2==1) printf $2 $3 " " ;else print $2 $3 }' '''
+    MEMORY_CMD = ''' dmidecode -t memory | grep  Size: | grep -v "No Module Installed" | grep -v "MB" | grep -v "Unknown" | awk '{sum+=$2}END{print sum"GB"}' '''
+    MEMORY_DETAIL_CMD = ''' dmidecode -t memory | grep -e "Size:" -e  "Speed:" | grep -v "No"  | grep -v "Configured Memory" | grep -v "MB" | grep -v "Unknown" |  uniq |  awk '{if(NR%2==1) printf $2 $3 " " ;else print $2 $3 }' '''
 
     ssh = get_ssh_client(ip, port, username, password)
 
     host = Host()
+    host.ip = ip
+    host.port = port
+    host.username = username
+    host.password = password
     host.hostname = execute_command(ssh, HOSTNAME_CMD)
     host.cpu_name = execute_command(ssh, CPU_NAME_CMD)
     host.cpu_base_clock = execute_command(ssh, CPU_BASE_CLOCK_CMD)
     host.disk = execute_command(ssh, DISK_LIST_CMD)
-    host.ip = ip
     host.os = execute_command(ssh, OS_CMD)
     host.bios_version = execute_command(ssh, BIOS_VERSION_CMD)
     host.memory = execute_command(ssh, MEMORY_CMD)
