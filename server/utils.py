@@ -38,7 +38,6 @@ def generate_host_data(host:Host, ip,
 
     ssh = get_ssh_client(ip, port, username, password)
 
-    host = Host()
     host.ip = ip
     host.port = port
     host.username = username
