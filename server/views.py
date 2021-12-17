@@ -36,5 +36,6 @@ def add_host(request):
 # get all host info by host.id
 def show_host_detail(request):
     # print(request.GET.get('id'))
-    host = Host.objects.filter(id=request.GET.get('id'))
+    host_qs = Host.objects.filter(Q(id=request.GET.get('id')) & Q(is_active=1))
+    host = host_qs[0]
     return render(request, 'host_detail.html', locals())
