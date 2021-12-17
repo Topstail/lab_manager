@@ -12,7 +12,7 @@ def show_all_host(request):
 
 def show_dashboard(request):
     labs = {}
-    print(request.path)
+    # print(request.path)
     return render(request, 'dashboard.html', locals())
 
 def add_host(request):
@@ -22,8 +22,9 @@ def add_host(request):
             # is_ip_exists()
             # 当值为false时，则表示数据库中未添加当前ip
             if not Host.objects.filter(Q(ip=request.POST.get('add_host_ip')) & Q(is_active=1)).exists():
-                print("No records")
-                new_host = generate_host_data(request.POST.get('add_host_ip'),
+                # print("No records")
+                new_host = generate_host_data(Host(), 
+                    request.POST.get('add_host_ip'),
                     request.POST.get('add_host_port'),
                     request.POST.get('add_host_username'),
                     request.POST.get('add_host_password'))
@@ -39,3 +40,11 @@ def show_host_detail(request):
     host_qs = Host.objects.filter(Q(id=request.GET.get('id')) & Q(is_active=1))
     host = host_qs[0]
     return render(request, 'host_detail.html', locals())
+
+def update_host(request):
+    host_list = Host.objects.filter(Q(is_active=1))
+    for host in host_list:
+        host = generate_host_data(host, host.ip, host.port, host.username, host.password)
+        host.save()
+        # print(host.ip)
+    return redirect(show_all_host)

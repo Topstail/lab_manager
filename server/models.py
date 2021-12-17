@@ -17,7 +17,7 @@ class Host(models.Model):
     bios_version = models.CharField(max_length=50)
     owner = models.CharField(max_length=20)
     memory = models.CharField(max_length=20)
-    memory_detail = models.CharField(max_length=500, default='')
+    memory_detail = models.CharField(max_length=2000, default='')
     is_active = models.BooleanField(default=True)
     lab_name = models.CharField(max_length=10, default='')
     rack_name = models.CharField(max_length=30, default='')

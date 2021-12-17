@@ -21,7 +21,7 @@ def execute_command(sshclient:SSHClient, cmd):
 def close_ssh_client(sshclient:SSHClient):
     sshclient.close()
 
-def generate_host_data(ip, 
+def generate_host_data(host:Host, ip, 
     port, 
     username, 
     password):
@@ -34,7 +34,7 @@ def generate_host_data(ip,
     OS_CMD = ''' grep -i "PRETTY_NAME" /etc/os-release | cut -d'"' -f2 '''
     BIOS_VERSION_CMD = ''' dmidecode -t bios | grep -i "version" | awk '{print $2}' '''
     MEMORY_CMD = ''' dmidecode -t memory | grep  Size: | grep -v "No Module Installed" | grep -v "MB" | grep -v "Unknown" | awk '{sum+=$2}END{print sum"GB"}' '''
-    MEMORY_DETAIL_CMD = ''' dmidecode -t memory | grep -e "Size:" -e  "Speed:" | grep -v "No"  | grep -v "Configured Memory" | grep -v "MB" | grep -v "Unknown" |  uniq |  awk '{if(NR%2==1) printf $2 $3 " " ;else print $2 $3 }' '''
+    MEMORY_DETAIL_CMD = ''' dmidecode -t memory | grep -e "Size" -e "Speed" | grep -v "Configured Memory" | awk '{if(NR%2==1)printf $2 $3 " ";else print $2 $3}' '''
 
     ssh = get_ssh_client(ip, port, username, password)
 
