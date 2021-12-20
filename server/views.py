@@ -2,7 +2,7 @@ from django.db.models.query_utils import Q
 from django.shortcuts import redirect, render
 from .utils import *
 from .models import *
-
+from concurrent.futures import ThreadPoolExecutor
 
 # Create your views here.
 
@@ -43,8 +43,9 @@ def show_host_detail(request):
 
 def update_host(request):
     host_list = Host.objects.filter(Q(is_active=1))
-    for host in host_list:
-        host = generate_host_data(host, host.ip, host.port, host.username, host.password)
-        host.save()
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        host_futures = [executor.submit(generate_host_data, host, host.ip, host.port, host.username, host.password) for host in host_list]
+        for host in host_futures:
+            host.result().save()
         # print(host.ip)
     return redirect(show_all_host)

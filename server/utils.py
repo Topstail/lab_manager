@@ -1,6 +1,7 @@
 import paramiko
 from paramiko.client import SSHClient
 from .models import Host
+from concurrent.futures import ThreadPoolExecutor
 
 def get_ssh_client(remote_ip, 
     remote_port, 
@@ -33,8 +34,8 @@ def generate_host_data(host:Host, ip,
     DISK_LIST_CMD = '''lsblk | egrep -e "^sd|^nvme" | awk '{print $1,$4}' '''
     OS_CMD = ''' grep -i "PRETTY_NAME" /etc/os-release | cut -d'"' -f2 '''
     BIOS_VERSION_CMD = ''' dmidecode -t bios | grep -i "version" | awk '{print $2}' '''
-    MEMORY_CMD = ''' dmidecode -t memory | grep  Size: | grep -v "No Module Installed" | grep -v "MB" | grep -v "Unknown" | awk '{sum+=$2}END{print sum"GB"}' '''
-    MEMORY_DETAIL_CMD = ''' dmidecode -t memory | grep -e "Size" -e "Speed" | grep -v "Configured Memory" | awk '{if(NR%2==1)printf $2 $3 " ";else print $2 $3}' '''
+    MEMORY_CMD = ''' dmidecode -t memory | grep -P -A5 "Memory\s+Device" | grep Size | grep -v Range  | grep -v "No" | awk '{if($3=="MB" && ($2/1024)%1==0) sum+=$2/1024;else if($3=="GB")sum+=$2}END{print sum"GB"}' '''
+    MEMORY_DETAIL_CMD = '''  dmidecode -t memory | grep -P -A16 "Memory\s+Device" | grep -v Range | grep -e "Size" -e "Speed" |  awk '{if(NR%2==1)printf $2 $3 "\t";else print $2 $3}' '''
 
     ssh = get_ssh_client(ip, port, username, password)
 
@@ -42,15 +43,26 @@ def generate_host_data(host:Host, ip,
     host.port = port
     host.username = username
     host.password = password
-    host.hostname = execute_command(ssh, HOSTNAME_CMD)
-    host.cpu_name = execute_command(ssh, CPU_NAME_CMD)
-    host.cpu_base_clock = execute_command(ssh, CPU_BASE_CLOCK_CMD)
-    host.disk = execute_command(ssh, DISK_LIST_CMD)
-    host.os = execute_command(ssh, OS_CMD)
-    host.bios_version = execute_command(ssh, BIOS_VERSION_CMD)
-    host.memory = execute_command(ssh, MEMORY_CMD)
-    host.memory_detail = execute_command(ssh, MEMORY_DETAIL_CMD)
-    
+    cmd_dict = {'hostname':HOSTNAME_CMD, 
+                'cpu_name':CPU_NAME_CMD,
+                'cpu_base_clock':CPU_BASE_CLOCK_CMD,
+                'disk':DISK_LIST_CMD,
+                'os':OS_CMD,
+                'bios_version':BIOS_VERSION_CMD,
+                'memory':MEMORY_CMD,
+                'memory_detail':MEMORY_DETAIL_CMD}
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {name: executor.submit(
+            execute_command, ssh, command) for name, command in cmd_dict.items()}
+        host.hostname = futures['hostname'].result()
+        host.cpu_name = futures['cpu_name'].result()
+        host.cpu_base_clock = futures['cpu_base_clock'].result()
+        host.disk = futures['disk'].result()
+        host.os = futures['os'].result()
+        host.bios_version = futures['bios_version'].result()
+        host.memory = futures['memory'].result()
+        host.memory_detail = futures['memory_detail'].result()
+
     ssh.close()
     return host
 
