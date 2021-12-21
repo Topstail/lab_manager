@@ -3,4 +3,10 @@ from .models import Host
 
 # Register your models here.
 
-admin.site.register(Host)
+class HostAdmin(admin.ModelAdmin):
+    list_display = ('ip', 'hostname', 'cpu_name', 'lab_name', 'owner')
+    list_filter = ('lab_name', 'cpu_name', )
+    list_per_page = 10
+    list_editable = ('owner', )
+
+admin.site.register(Host, HostAdmin)

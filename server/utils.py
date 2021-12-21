@@ -1,7 +1,9 @@
 import paramiko
+from paramiko import ssh_exception
 from paramiko.client import SSHClient
 from .models import Host
 from concurrent.futures import ThreadPoolExecutor
+from django.http import Http404
 
 def get_ssh_client(remote_ip, 
     remote_port, 
@@ -10,7 +12,10 @@ def get_ssh_client(remote_ip,
 
     sshclient = paramiko.SSHClient()
     sshclient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    sshclient.connect(hostname=remote_ip, port=remote_port, username=remote_username,password=remote_password)
+    try:    
+        sshclient.connect(hostname=remote_ip, port=remote_port, username=remote_username,password=remote_password)
+    except ssh_exception.NoValidConnectionsError as e:
+        raise Http404('Unable to connect to port 22 on 111')
     return sshclient
 
 def execute_command(sshclient:SSHClient, cmd):
