@@ -35,7 +35,7 @@
 </head>
 
 <body>
- 
+
     <div class="wrapper">
         <div class="sidebar" data-image="img/sidebar-5.jpg">
             <!--
@@ -165,7 +165,7 @@
                                         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
                                         aria-hidden="true">
                                         <div class="modal-dialog">
-                                            <form action="add_host" method="post">
+                                            <form class="was-validated" action="add_host" method="post">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="staticBackdropLabel">Add Host
@@ -179,12 +179,16 @@
                                                                 Host IP</label>
                                                             <input type="text" class="form-control" id="add_host_ip"
                                                                 name="add_host_ip" placeholder="10.238.152.*" required>
+                                                            <div class="invalid-feedback">Please fill in an IP address</div>
+                                                            <div class="valid-feedback">looks good!</div>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="add_host_port" class="form-label">
                                                                 PORT</label>
                                                             <input type="text" class="form-control" id="add_host_port"
                                                                 name="add_host_port" placeholder="22" required>
+                                                            <div class="invalid-feedback">Please fill in an port</div>
+                                                            <div class="valid-feedback">looks good!</div>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="add_host_username" class="form-label">
@@ -192,36 +196,57 @@
                                                             <input type="text" class="form-control"
                                                                 id="add_host_username" name="add_host_username"
                                                                 placeholder="root" required>
+                                                            <div class="invalid-feedback">Please fill in an username</div>
+                                                            <div class="valid-feedback">looks good!</div>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="add_host_password" class="form-label">
                                                                 PASSWORD</label>
-                                                            <input type="text" class="form-control"
+                                                            <input type="password" class="form-control"
                                                                 id="add_host_password" name="add_host_password"
                                                                 required>
+                                                            <div class="invalid-feedback">Please fill in an password</div>
+                                                            <div class="valid-feedback">looks good!</div>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="add_host_owner" class="form-label">
-                                                                Host Owner</label>
-                                                            <input type="text" class="form-control" id="add_host_owner"
-                                                                name="add_host_owner">
+                                                            <label for="add_host_owner" class="form-label">Host
+                                                                Owner</label>
+                                                            <select class="form-select" aria-label="add_host_owner"
+                                                                name="add_host_owner" required >
+                                                                <option selected value="">Open this select menu</option>
+                                                                <option value="Deng, Gang">Deng, Gang</option>
+                                                                <option value="Tang, Xi">Tang, Xi</option>
+                                                                <option value="Jiang, Hua">Jiang, Hua</option>
+                                                                <option value="Liu, Heyuan">Liu, Heyuan</option>
+                                                                <option value="Gui, Sheng">Gui, Sheng</option>
+                                                                <option value="Lu, Zhongyan">Lu, Zhongyan</option>
+                                                                <option value="Xu, Qijia">Xu, Qijia</option>
+                                                                <option value="Yu, Meng">Yu, Meng</option>
+                                                                <option value="Chen, Jin">Chen, Jin</option>
+                                                                <option value="Liu, Yun">Liu, Yun</option>
+                                                                <option value="Chi, Haonan">Chi, Haonan</option>
+                                                            </select>
+                                                            <div class="invalid-feedback">Please select one of the owners</div>
+                                                            <div class="valid-feedback">very good!</div>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="add_host_which_lab" class="form-label">Which
                                                                 Lab</label>
-                                                            <select class="form-control" aria-label="add_host_which_lab"
-                                                                name="add_host_which_lab">
+                                                            <select class="form-select" aria-label="add_host_which_lab"
+                                                                name="add_host_which_lab" required>
                                                                 <option selected value="">Open this select menu</option>
                                                                 <option value="18L01">18L01</option>
                                                                 <option value="18L03">18L03</option>
                                                                 <option value="18L06">18L06</option>
                                                             </select>
+                                                            <div class="invalid-feedback">Please select one of the labs</div>
+                                                            <div class="valid-feedback">very good!</div>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-primary">Insert</button>
+                                                        <button type="button" class="btn btn-primary" onclick="check()">Insert</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -241,7 +266,8 @@
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">No, please</button>
-                                                    <a href="update_host"><button type="button" class="btn btn-primary">Yes, I sure</button></a>
+                                                    <a href="update_host"><button type="button"
+                                                            class="btn btn-primary">Yes, I sure</button></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -341,5 +367,13 @@
 <!-- Light Bootstrap Dashboard DEMO methods, don't include it in your project! -->
 <script src="{% static 'js/demo.js' %}"></script>
 
+<script type="text/javascript">
+    function check() {
+        /**
+         * 编写验证代码,若不想提交,就可以提前return;达到不提交
+         */
+        $("form").submit();
+    }
+</script>
 
 </html>

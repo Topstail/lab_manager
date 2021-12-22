@@ -61,7 +61,10 @@ def generate_host_data(host:Host, ip,
             execute_command, ssh, command) for name, command in cmd_dict.items()}
         host.hostname = futures['hostname'].result()
         host.cpu_name = futures['cpu_name'].result()
-        host.cpu_base_clock = futures['cpu_base_clock'].result()
+        if ( futures['cpu_base_clock'].result() == '$' or futures['cpu_base_clock'].result() =='' ):
+            host.cpu_base_clock = ''
+        else:
+            host.cpu_base_clock = futures['cpu_base_clock'].result()
         host.disk = futures['disk'].result()
         host.os = futures['os'].result()
         host.bios_version = futures['bios_version'].result()
